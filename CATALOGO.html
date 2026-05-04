@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo de Productos - S3D</title>
+    
+    <!-- Fuentes de Google: Montserrat (Títulos) e Inter (Textos) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@500;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Configuración de Tailwind para las nuevas fuentes -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        title: ['Montserrat', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            900: '#0f172a', /* Un azul marino casi negro, muy elegante */
+                            800: '#1e293b',
+                            accent: '#2563eb'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        /* Clases utilitarias para separar la versión Web de la versión PDF */
+        .print-only, .print-only-flex { 
+            display: none; 
+        }
+
+        /* --- MODO IMPRESIÓN / PDF --- */
+        @media print {
+            /* Configuración de la hoja A4 */
+            @page { 
+                size: A4 portrait; 
+                margin: 12mm; 
+            }
+            
+            body { 
+                background-color: white !important; 
+                -webkit-print-color-adjust: exact !important; 
+                print-color-adjust: exact !important; 
+            }
+            
+            /* Ocultar la barra de navegación web, el header grande web y el footer web */
+            nav, header, footer, .no-print { 
+                display: none !important; 
+            }
+            
+            /* Mostrar la cabecera limpia y profesional diseñada para el PDF */
+            .print-only { display: block !important; }
+            .print-only-flex { display: flex !important; }
+
+            /* Forzar una cuadrícula estricta de 2 columnas para el documento */
+            #productos-grid {
+                display: grid !important;
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 10mm !important; /* Espaciado fijo en milímetros */
+            }
+
+            /* Reiniciar márgenes del contenedor principal para aprovechar toda la hoja */
+            main { 
+                padding: 0 !important; 
+                margin: 0 !important; 
+                max-width: 100% !important; 
+            }
+
+            /* Evitar que las tarjetas de producto se corten a la mitad en el cambio de página */
+            .print-break-avoid { 
+                break-inside: avoid !important; 
+                page-break-inside: avoid !important; 
+                box-shadow: none !important; 
+                border: 1.5px solid #e2e8f0 !important;
+                margin-bottom: 0 !important;
+                border-radius: 12px !important;
+            }
+
+            /* Altura controlada de la imagen para que encaje perfecto en PDF */
+            .img-wrapper {
+                height: 200px !important;
+                padding: 10px !important;
+            }
+
+            /* Ajuste de tipografías exclusivamente para la hoja impresa */
+            .print-text-sm { font-size: 10pt !important; line-height: 1.4 !important; }
+            .print-text-xs { font-size: 8pt !important; }
+            .print-title { font-size: 13pt !important; margin-bottom: 4px !important; }
+            .print-price { font-size: 18pt !important; }
+            
+            /* Ajustar espacios internos de la tarjeta en PDF */
+            .print-card-body {
+                padding: 12px 16px !important;
+            }
+            .print-mt-auto {
+                margin-top: 8px !important;
+                padding-top: 10px !important;
+            }
+            .print-tag {
+                margin-bottom: 8px !important;
+                padding: 4px 8px !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-[#f8fafc] text-gray-800 antialiased selection:bg-brand-accent selection:text-white">
+
+    <!-- --- CABECERA EXCLUSIVA PARA PDF (Oculta en la web) --- -->
+    <div class="print-only-flex items-center justify-between border-b-4 border-brand-accent pb-4 mb-6">
+        <div class="flex items-center gap-4">
+            <div class="w-16 h-16 rounded-xl overflow-hidden shadow-sm border border-gray-200 bg-white p-1">
+                <img src="WhatsApp Image 2026-01-07 at 00.49.01.jpeg" alt="Logo S3D" class="w-full h-full object-cover rounded-lg">
+            </div>
+            <div>
+                <h1 class="font-title font-black text-4xl text-brand-900 tracking-tight leading-none">S3D</h1>
+                <p class="text-[11px] text-gray-500 uppercase tracking-[0.25em] font-bold mt-1">Imprimimos tu mundo</p>
+            </div>
+        </div>
+        <div class="text-right">
+            <h2 class="font-title font-extrabold text-2xl text-brand-900">Catálogo Oficial</h2>
+            <p class="text-gray-600 font-medium mt-1 text-sm">WhatsApp: +51 955 107 609</p>
+            <p class="text-gray-600 font-medium text-sm">Instagram: @print.s3d</p>
+        </div>
+    </div>
+
+    <!-- --- HEADER / NAVEGACIÓN --- -->
+    <nav class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl overflow-hidden shadow-sm bg-white border border-gray-50 flex items-center justify-center">
+                        <img src="WhatsApp Image 2026-01-07 at 00.49.01.jpeg" alt="Logo S3D" class="w-full h-full object-cover">
+                    </div>
+                    <div>
+                        <h1 class="font-title font-black text-2xl tracking-tight text-brand-900 leading-none">S3D</h1>
+                        <p class="text-[10px] text-gray-500 uppercase tracking-[0.2em] font-semibold mt-1">Imprimimos tu mundo</p>
+                    </div>
+                </div>
+                <!-- Contacto rápido web -->
+                <div class="hidden sm:flex items-center gap-2 no-print">
+                    <a href="https://api.whatsapp.com/send?phone=51955107609" target="_blank" class="flex items-center gap-2 text-sm font-semibold text-gray-600 hover:text-[#25D366] transition-colors">
+                        <i data-lucide="phone" class="w-4 h-4"></i>
+                        955 107 609
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- --- HERO SECTION --- -->
+    <header class="bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+            <div class="max-w-3xl">
+                <h2 class="font-title text-4xl md:text-5xl font-extrabold text-brand-900 mb-4 tracking-tight">Colección <span class="text-brand-accent">DÍA DE LA MADRE</span></h2>
+                <p class="text-gray-500 text-lg md:text-xl leading-relaxed font-light mb-8">Descubre nuestras piezas de diseño impresas en 3D para este día tan especial. </p>
+                
+                <!-- Trust Badges (Generadores de confianza) -->
+                <div class="flex flex-wrap gap-4 md:gap-8">
+                    <div class="flex items-center gap-2 text-sm font-medium text-gray-700">
+                        <div class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-brand-accent">
+                            <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                        </div>
+                        Alta Calidad
+                    </div>
+                    <div class="flex items-center gap-2 text-sm font-medium text-gray-700">
+                        <div class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-brand-accent">
+                            <i data-lucide="pen-tool" class="w-4 h-4"></i>
+                        </div>
+                        Diseño Moderno
+                    </div>
+                    <div class="flex items-center gap-2 text-sm font-medium text-gray-700">
+                        <div class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-brand-accent">
+                            <i data-lucide="truck" class="w-4 h-4"></i>
+                        </div>
+                        Envíos Seguros
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- --- GRID DE PRODUCTOS --- -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div id="productos-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Productos renderizados por JS -->
+        </div>
+    </main>
+
+    <!-- --- FOOTER --- -->
+    <footer class="bg-brand-900 text-white mt-12 py-16 border-t-[6px] border-brand-accent">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-8">
+                
+                <div>
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center overflow-hidden">
+                            <img src="WhatsApp Image 2026-01-07 at 00.49.01.jpeg" alt="Logo S3D" class="w-full h-full object-cover">
+                        </div>
+                        <div>
+                            <h3 class="font-title text-2xl font-black tracking-wider">S3D</h3>
+                            <p class="text-gray-400 text-[10px] uppercase tracking-[0.2em] mt-1">Imprimimos tu mundo</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-400 text-sm leading-relaxed max-w-sm">Dando vida a tus ideas mediante impresión 3D de vanguardia. Decoración, regalos y piezas personalizadas.</p>
+                </div>
+
+                <div>
+                    <h4 class="font-title text-lg font-bold mb-6 text-white tracking-wide">Contacto Directo</h4>
+                    <ul class="space-y-4">
+                        <li>
+                            <a href="https://api.whatsapp.com/send?phone=51955107609" target="_blank" class="flex items-center text-gray-300 hover:text-white transition-colors group w-fit">
+                                <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center mr-4 group-hover:bg-[#25D366] transition-colors">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 448 512"><path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157.1zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"/></svg>
+                                </div>
+                                <span class="font-medium tracking-wide">+51 955 107 609</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-title text-lg font-bold mb-6 text-white tracking-wide">Síguenos</h4>
+                    <div class="flex space-x-4">
+                        <a href="https://www.instagram.com/print.s3d" target="_blank" class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center hover:bg-gradient-to-tr hover:from-[#f09433] hover:via-[#dc2743] hover:to-[#bc1888] transition-all duration-300 shadow-md">
+                            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 448 512"><path d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12.8 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1s2.7 102.7-9 132.1z"/></svg>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+            <div class="border-t border-white/10 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-gray-500 text-xs">
+                <p>&copy; <span id="current-year"></span> S3D. Todos los derechos reservados.</p>
+                <p>Catálogo Oficial</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Lógica del Catálogo -->
+    <script>
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+
+        const productos = [
+            { nombre: "MADRE E HIJO", tamano: "14,6 CM", precio: 35.00, imagen: "MADRE E HIJO.jpeg", descripcion: "Hermosa figura impresa en 3D que representa el amor maternal." },
+            { nombre: "CORAZÓN EN CORAZÓN", tamano: "15,0 CM", precio: 30.00, imagen: "CORAZON EN CORAZON.jpeg", descripcion: "Elegante pieza decorativa con diseño de corazones entrelazados." },
+            { nombre: "ORGANIZADOR CORAZÓN", tamano: "11,5 CM", precio: 29.00, imagen: "ORGANIZADOR CORAZON.jpeg", descripcion: "Práctico organizador con forma de corazón para accesorios." },
+            { nombre: "CORAZÓN CON ROSA", tamano: "12,3 CM / 20,0 CM", precio: 21.00, imagen: "CORAZON CON ROSA.jpeg", descripcion: "Detalle romántico y único, perfecto para regalar." },
+            { nombre: "OSO CORAZÓN", tamano: "15,6 CM", precio: 28.00, imagen: "OSO CON CORAZON.jpeg", descripcion: "Tierno oso impreso en 3D sosteniendo un corazón. Ideal para regalo." },
+            { nombre: "JARRÓN CHINO", tamano: "25,0 CM", precio: 24.00, imagen: "JARRON CHINO.jpeg", descripcion: "Jarrón con un diseño clásico inspirado en la porcelana china." },
+            { nombre: "TULIPÁN", tamano: "24,2 CM", precio: 32.00, imagen: "TULIPAN.jpeg", descripcion: "Flor de tulipán impresa en 3D, un toque de naturaleza." },
+            { nombre: "JARRÓN ESPIRAL BASE", tamano: "19,00 CM", precio: 34.00, imagen: "JARRON ESPIRAL BASE.jpeg", descripcion: "Moderno jarrón espiral que aporta dinamismo a cualquier espacio." },
+            { nombre: "JARRÓN LUNA", tamano: "17,2 CM", precio: 25.00, imagen: "JARRON LUNA.jpeg", descripcion: "Elegante jarrón con forma de luna creciente, pieza única." },
+            { nombre: "JARRÓN TWISTING ELEG", tamano: "25 CM", precio: 34.00, imagen: "JARRON TWISTING.jpeg", descripcion: "Sofisticado jarrón con un diseño de torsión elegante y fluido." },
+            { nombre: "JARRÓN TEXTURIZADO", tamano: "25 CM", precio: 31.00, imagen: "JARRON TEZTURIZADO.jpeg", descripcion: "Jarrón con una textura geométrica única y elegante." },
+            { nombre: "JARRÓN ESPIRAL G", tamano: "25 CM", precio: 36.00, imagen: "JARRON ESPIRAL G.jpeg", descripcion: "Jarrón alto en espiral, ideal para arreglos grandes." },
+            { nombre: "JARRÓN ESPIRAL B", tamano: "20 CM", precio: 29.00, imagen: "JARRON ESPIRAL B.jpeg", descripcion: "Versión mediana de nuestro clásico jarrón espiral." },
+            { nombre: "JARRÓN ESPIRAL D", tamano: "18 CM", precio: 28.00, imagen: "JARRON ESPIRAL D.jpeg", descripcion: "Pequeño y decorativo jarrón con giro cerrado." },
+            { nombre: "ELEFANTITO", tamano: "15 CM", precio: 25.00, imagen: "ELEFANTITO.jpeg", descripcion: "Tierno elefantito impreso en 3D, perfecto para decorar cualquier espacio o regalar." }
+        ];
+
+        const grid = document.getElementById('productos-grid');
+        
+        const htmlContent = productos.map(producto => `
+            <div class="print-break-avoid bg-white rounded-[20px] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col h-full group mb-8 print-shadow-none">
+                
+                <!-- Fondo de imagen premium sutilmente gris -->
+                <div class="img-wrapper relative h-[22rem] overflow-hidden bg-[#f1f5f9] flex items-center justify-center p-6 border-b border-gray-100">
+                    <img 
+                        src="${producto.imagen}" 
+                        alt="${producto.nombre}"
+                        class="w-full h-full object-contain object-center group-hover:scale-105 transition-transform duration-700 ease-in-out drop-shadow-sm"
+                        onerror="this.src='https://placehold.co/600x400/eeeeee/999999?text=Añadir+Foto'"
+                    />
+                </div>
+
+                <!-- Info Card -->
+                <div class="print-card-body p-6 flex flex-col flex-grow bg-white">
+                    <h3 class="print-title font-title text-lg font-bold text-brand-900 leading-tight mb-2 group-hover:text-brand-accent transition-colors">${producto.nombre}</h3>
+                    <p class="print-text-sm text-gray-500 text-sm leading-relaxed mb-4 flex-grow line-clamp-2">${producto.descripcion}</p>
+                    
+                    <!-- Etiqueta de tamaño elegante -->
+                    <div class="print-tag mb-5 inline-flex items-center gap-2 bg-gray-50 border border-gray-100 px-3 py-1.5 rounded-lg w-fit">
+                        <i data-lucide="ruler" class="w-4 h-4 text-gray-400"></i>
+                        <span class="print-text-xs text-xs font-medium text-gray-600">Medida: <span class="font-bold text-gray-900">${producto.tamano}</span></span>
+                    </div>
+
+                    <!-- Precio y Botón de Acción -->
+                    <div class="print-mt-auto flex items-center justify-between mt-auto pt-4 border-t border-gray-100">
+                        <div class="flex flex-col">
+                            <span class="text-[10px] text-gray-400 font-bold tracking-widest uppercase mb-1">Precio Unitario</span>
+                            <div class="flex items-start">
+                                <span class="font-title text-sm font-bold text-brand-900 mt-1 mr-1">S/</span>
+                                <span class="print-price font-title text-3xl font-black text-brand-900 tracking-tight">${producto.precio.toFixed(2)}</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Botón WhatsApp estilo Pill (Pastilla) Premium -->
+                        <a 
+                            href="https://api.whatsapp.com/send?phone=51955107609&text=Hola,%20me%20interesa%20el%20producto:%20${encodeURIComponent(producto.nombre)}" 
+                            target="_blank" 
+                            class="no-print bg-[#25D366] hover:bg-[#20b858] text-white px-5 py-3 rounded-xl shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-2"
+                            title="Pedir por WhatsApp"
+                        >
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 448 512"><path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157.1zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"/></svg>
+                            <span class="font-bold text-sm tracking-wide hidden sm:block">Pedir</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+
+        grid.innerHTML = htmlContent;
+        lucide.createIcons();
+    </script>
+</body>
+</html>
